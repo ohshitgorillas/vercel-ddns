@@ -58,7 +58,7 @@ COPY dns.config /root/dns.config
 COPY start.sh /root/start.sh
 
 # Cloning app
-RUN curl -o /root/dns-sync.sh https://raw.githubusercontent.com/ohshitgorillas/vercel-ddns/main/dns-sync.sh
+RUN curl -o /root/dns-sync.sh https://raw.githubusercontent.com/ohshitgorillas/vercel-ddns/master/dns-sync.sh
 RUN chmod +x /root/dns-sync.sh
 
 # Setting up cron to run every minute
