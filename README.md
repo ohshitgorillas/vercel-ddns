@@ -61,8 +61,8 @@ COPY start.sh /root/start.sh
 RUN curl -o /root/dns-sync.sh https://raw.github.com/ohshitgorillas/vercel-ddns/master/dns-sync.sh
 RUN chmod +x /root/dns-sync.sh
 
-# Route cron output to Docker stdout and log file
-RUN echo "* * * * * /root/dns-sync.sh 2>&1 | tee -a /var/log/dns-sync.log >> /proc/1/fd/1" >> /etc/crontabs/root
+# Setting up cron to run every minute
+RUN echo "* * * * * /root/dns-sync.sh >> /var/log/dns-sync.log 2>&1" >> /etc/crontabs/root
 
 # Starting
 CMD ["bash", "/root/start.sh"]
