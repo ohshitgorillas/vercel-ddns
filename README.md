@@ -3,6 +3,10 @@
 Simple script for exposing a local server with [Vercel DNS](https://vercel.com/docs/custom-domains).
 It runs on CRON, checking the current IP address and updating DNS records for your domain.
 
+This fork has been modified to:
+* Work with accounts that have Team IDs
+* Distinguish A from AAAA records
+
 ## Installation
 
 1. Ensure that you have [jq](https://github.com/jqlang/jq) installed
@@ -54,11 +58,11 @@ COPY dns.config /root/dns.config
 COPY start.sh /root/start.sh
 
 # Cloning app
-RUN curl -o /root/dns-sync.sh https://raw.githubusercontent.com/iam-medvedev/vercel-ddns/master/dns-sync.sh
+RUN curl -o /root/dns-sync.sh https://raw.github.com/ohshitgorillas/vercel-ddns/master/dns-sync.sh
 RUN chmod +x /root/dns-sync.sh
 
-# Setting up cron
-RUN echo "*/30 * * * * /root/dns-sync.sh >> /var/log/dns-sync.log 2>&1" >> /etc/crontabs/root
+# Setting up cron to run every minute
+RUN echo "* * * * * /root/dns-sync.sh >> /var/log/dns-sync.log 2>&1" >> /etc/crontabs/root
 
 # Starting
 CMD ["bash", "/root/start.sh"]
