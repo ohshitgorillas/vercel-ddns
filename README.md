@@ -21,15 +21,15 @@ This fork has been modified to:
 ```sh
 # Creating
 ➜  ./dns-sync.sh
-Updating IP: x.x.x.x
-Record for SUBDOMAIN does not exist. Creating...
-🎉 Done!
+Current IP: x.x.x.x
+Record for SUBDOMAIN.example.com does not exist. Creating...
+Done.
 
 # Updating
 ➜  ./dns-sync.sh
-Updating IP: x.x.x.x
-Record for SUBDOMAIN already exists (id: rec_xxxxxxxxxxxxxxxxxxxxxxxx). Updating...
-🎉 Done!
+Current IP: x.x.x.x
+Record for SUBDOMAIN.example.com already exists (id: rec_xxxxxxxxxxxxxxxxxxxxxxxx). Updating...
+Done.
 ```
 
 ## Docker
@@ -58,7 +58,7 @@ COPY dns.config /root/dns.config
 COPY start.sh /root/start.sh
 
 # Cloning app
-RUN curl -o /root/dns-sync.sh https://raw.github.com/ohshitgorillas/vercel-ddns/master/dns-sync.sh
+RUN curl -o /root/dns-sync.sh https://raw.githubusercontent.com/ohshitgorillas/vercel-ddns/main/dns-sync.sh
 RUN chmod +x /root/dns-sync.sh
 
 # Setting up cron to run every minute
