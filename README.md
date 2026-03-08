@@ -50,7 +50,7 @@ FROM alpine:latest
 WORKDIR /root
 
 # Installing dependencies
-RUN apk --no-cache add dcron curl jq bash
+RUN apk --no-cache add curl jq bash
 SHELL ["/bin/bash", "-c"]
 
 # Copy config
@@ -64,7 +64,7 @@ RUN chmod +x /root/dns-sync.sh
 RUN echo "* * * * * /root/dns-sync.sh >> /var/log/dns-sync.log 2>&1" >> /etc/crontabs/root
 
 # Perform first sync immediately, then hand off to cron
-CMD ["/bin/bash", "-c", "/root/dns-sync.sh && crond -f"]
+CMD ["/bin/bash", "-c", "/root/dns-sync.sh && crond -f -l 2"]
 ```
 
 ## IPv4 vs IPv6
