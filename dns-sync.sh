@@ -3,7 +3,7 @@
 # Vercel Dynamic DNS
 # https://github.com/iam-medvedev/vercel-ddns
 
-source ./dns.config
+source /root/dns.config
 
 # Check if jq is installed
 if ! command -v jq >/dev/null; then
@@ -22,12 +22,12 @@ get_current_ip() {
 check_subdomain_exists() {
   local subdomain="$1"
   local response
-  response=$(curl -sX GET "https://api.vercel.com/v4/domains/$DOMAIN_NAME/records" \
+  response=$(curl -sX GET "https://api.vercel.com/v4/domains/$DOMAIN_NAME/records?teamId=$TEAM_ID" \
     -H "Authorization: Bearer $VERCEL_TOKEN" \
     -H "Content-Type: application/json")
 
   local record_id
-  record_id=$(echo "$response" | jq -r ".records[] | select(.name == \"$subdomain\") | .id")
+  record_id=$(echo "$response" | jq -r ".records[] | select(.name == \"$subdomain\" and .type == \"A\") | .id")
   if [[ -n "$record_id" ]]; then
     # Return record ID if exists
     echo "$record_id"
@@ -42,7 +42,7 @@ update_dns_record() {
   local ip="$1"
   local record_id="$2"
   local response
-  response=$(curl -sX PATCH "https://api.vercel.com/v1/domains/records/$record_id" \
+  response=$(curl -sX PATCH "https://api.vercel.com/v1/domains/records/$record_id?teamId=$TEAM_ID" \
     -H "Authorization: Bearer $VERCEL_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
@@ -66,7 +66,7 @@ update_dns_record() {
 create_dns_record() {
   local ip="$1"
   local response
-  response=$(curl -sX POST "https://api.vercel.com/v4/domains/$DOMAIN_NAME/records" \
+  response=$(curl -sX POST "https://api.vercel.com/v4/domains/$DOMAIN_NAME/records?teamId=$TEAM_ID" \
     -H "Authorization: Bearer $VERCEL_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
