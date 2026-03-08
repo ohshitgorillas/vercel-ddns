@@ -14,7 +14,7 @@ This fork has been modified to:
 3. Move `dns.config.example` to `dns.config`
 4. Edit the configuration variables as required
 5. Open the cron settings using the command `crontab -e`
-6. Add the following line to the cron job: `*/15 * * * * /path-to/vercel-ddns/dns-sync.sh`
+6. Add the following line to the cron job: `* * * * * /path-to/vercel-ddns/dns-sync.sh`
 
 ## Usage example
 
