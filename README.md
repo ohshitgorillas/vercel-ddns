@@ -61,7 +61,7 @@ RUN curl -o /root/dns-sync.sh https://raw.githubusercontent.com/ohshitgorillas/v
 RUN chmod +x /root/dns-sync.sh
 
 # Setting up cron to run every minute
-RUN echo "* * * * * /root/dns-sync.sh >> /var/log/dns-sync.log 2>&1" >> /etc/crontabs/root
+RUN echo "* * * * * /root/dns-sync.sh >> /proc/1/fd/1 2>&1" >> /etc/crontabs/root
 
 # Perform first sync immediately, then hand off to cron
 CMD ["/bin/bash", "-c", "/root/dns-sync.sh && crond -f -l 2"]
