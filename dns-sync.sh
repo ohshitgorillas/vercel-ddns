@@ -21,7 +21,7 @@ fi
 get_current_ip() {
   local ip
   if [[ "$RECORD_TYPE" == "AAAA" ]]; then
-    ip=$(curl -s https://api6.ipify.org)
+    ip=$(curl -6 -s https://ifconfig.co)
   else
     ip=$(curl -s http://whatismyip.akamai.com/)
   fi
