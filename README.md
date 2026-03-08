@@ -37,11 +37,10 @@ Done.
 
 There is a dockerized version of `vercel-ddns` with `CRON`.
 
-Create 3 files in your directory:
+Create 2 files in your directory:
 
 1. `Dockerfile`.
-2. `start.sh` - docker entry point
-3. `dns.config` - configuration for `vercel-ddns`.
+2. `dns.config` - configuration for `vercel-ddns`.
 
 `Dockerfile`:
 
@@ -54,9 +53,8 @@ WORKDIR /root
 RUN apk --no-cache add dcron curl jq bash
 SHELL ["/bin/bash", "-c"]
 
-# Cloning config and start file
+# Copy config
 COPY dns.config /root/dns.config
-COPY start.sh /root/start.sh
 
 # Cloning app
 RUN curl -o /root/dns-sync.sh https://raw.githubusercontent.com/ohshitgorillas/vercel-ddns/master/dns-sync.sh
@@ -65,15 +63,8 @@ RUN chmod +x /root/dns-sync.sh
 # Setting up cron to run every minute
 RUN echo "* * * * * /root/dns-sync.sh >> /var/log/dns-sync.log 2>&1" >> /etc/crontabs/root
 
-# Starting
-CMD ["bash", "/root/start.sh"]
-```
-
-`start.sh`:
-
-```sh
-# Performs the first sync and starts CRON
-bash /root/dns-sync.sh && crond -f
+# Perform first sync immediately, then hand off to cron
+CMD ["/bin/bash", "-c", "/root/dns-sync.sh && crond -f"]
 ```
 
 ## IPv4 vs IPv6
