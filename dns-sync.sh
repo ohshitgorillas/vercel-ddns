@@ -8,7 +8,7 @@ source /root/dns.config
 # Build optional team query parameter
 TEAM_QUERY=""
 if [[ -n "$TEAM_ID" ]]; then
-  TEAM_QUERY="$TEAM_QUERY"
+  TEAM_QUERY="?teamId=$TEAM_ID"
 fi
 
 # Check if jq is installed
