@@ -8,3 +8,6 @@ DOMAIN_NAME=""
 
 # Subdomain to update (note: use an empty string for the root record)
 SUBDOMAIN=""
+
+# Team ID (Vercel Dashboard > Settings)
+TEAM_ID=""
