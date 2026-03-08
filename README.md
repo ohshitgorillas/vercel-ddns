@@ -4,7 +4,7 @@ Simple script for exposing a local server with [Vercel DNS](https://vercel.com/d
 It runs on CRON, checking the current IP address and updating DNS records for your domain.
 
 This fork has been modified to:
-* Work with accounts that have Team IDs
+* Support optional Team IDs (for both personal and team accounts)
 * Distinguish A from AAAA records
 
 ## Installation

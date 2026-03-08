@@ -5,6 +5,12 @@
 
 source /root/dns.config
 
+# Build optional team query parameter
+TEAM_QUERY=""
+if [[ -n "$TEAM_ID" ]]; then
+  TEAM_QUERY="$TEAM_QUERY"
+fi
+
 # Check if jq is installed
 if ! command -v jq >/dev/null; then
   echo "Error: 'jq' is not installed. Please install 'jq' to run this script."
@@ -26,7 +32,7 @@ get_current_ip() {
 check_subdomain_exists() {
   local subdomain="$1"
   local response
-  response=$(curl -sX GET "https://api.vercel.com/v4/domains/$DOMAIN_NAME/records?teamId=$TEAM_ID" \
+  response=$(curl -sX GET "https://api.vercel.com/v4/domains/$DOMAIN_NAME/records$TEAM_QUERY" \
     -H "Authorization: Bearer $VERCEL_TOKEN" \
     -H "Content-Type: application/json")
 
@@ -46,7 +52,7 @@ update_dns_record() {
   local ip="$1"
   local record_id="$2"
   local response
-  response=$(curl -sX PATCH "https://api.vercel.com/v1/domains/records/$record_id?teamId=$TEAM_ID" \
+  response=$(curl -sX PATCH "https://api.vercel.com/v1/domains/records/$record_id$TEAM_QUERY" \
     -H "Authorization: Bearer $VERCEL_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
@@ -70,7 +76,7 @@ update_dns_record() {
 create_dns_record() {
   local ip="$1"
   local response
-  response=$(curl -sX POST "https://api.vercel.com/v4/domains/$DOMAIN_NAME/records?teamId=$TEAM_ID" \
+  response=$(curl -sX POST "https://api.vercel.com/v4/domains/$DOMAIN_NAME/records$TEAM_QUERY" \
     -H "Authorization: Bearer $VERCEL_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{

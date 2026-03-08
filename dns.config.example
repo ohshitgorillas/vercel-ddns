@@ -9,7 +9,7 @@ DOMAIN_NAME=""
 # Subdomain to update (note: use an empty string for the root record)
 SUBDOMAIN=""
 
-# Team ID (Vercel Dashboard > Settings)
+# Team ID (Vercel Dashboard > Settings) - leave empty if not using a team
 TEAM_ID=""
 
 # Record type: "A" for IPv4, "AAAA" for IPv6 (default: A)
