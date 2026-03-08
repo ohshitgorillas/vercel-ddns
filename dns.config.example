@@ -11,3 +11,6 @@ SUBDOMAIN=""
 
 # Team ID (Vercel Dashboard > Settings)
 TEAM_ID=""
+
+# Record type: "A" for IPv4, "AAAA" for IPv6 (default: A)
+RECORD_TYPE="A"

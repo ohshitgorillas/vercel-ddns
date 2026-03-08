@@ -11,10 +11,14 @@ if ! command -v jq >/dev/null; then
   exit 1
 fi
 
-# Returns current IP
+# Returns current IP (IPv4 for A records, IPv6 for AAAA records)
 get_current_ip() {
   local ip
-  ip=$(curl -s http://whatismyip.akamai.com/)
+  if [[ "$RECORD_TYPE" == "AAAA" ]]; then
+    ip=$(curl -s https://api6.ipify.org)
+  else
+    ip=$(curl -s http://whatismyip.akamai.com/)
+  fi
   echo $ip
 }
 
@@ -27,7 +31,7 @@ check_subdomain_exists() {
     -H "Content-Type: application/json")
 
   local record_id
-  record_id=$(echo "$response" | jq -r ".records[] | select(.name == \"$subdomain\" and .type == \"A\") | .id")
+  record_id=$(echo "$response" | jq -r ".records[] | select(.name == \"$subdomain\" and .type == \"$RECORD_TYPE\") | .id")
   if [[ -n "$record_id" ]]; then
     # Return record ID if exists
     echo "$record_id"
@@ -48,7 +52,7 @@ update_dns_record() {
     -d '{
       "comment": "vercel-ddns",
       "name": "'$SUBDOMAIN'",
-      "type": "A",
+      "type": "'$RECORD_TYPE'",
       "value": "'$ip'",
       "ttl": 60
     }')
@@ -72,7 +76,7 @@ create_dns_record() {
     -d '{
       "comment": "vercel-ddns",
       "name": "'$SUBDOMAIN'",
-      "type": "A",
+      "type": "'$RECORD_TYPE'",
       "value": "'$ip'",
       "ttl": 60
     }')
