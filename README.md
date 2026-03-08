@@ -72,7 +72,10 @@ CMD ["bash", "/root/start.sh"]
 
 ```sh
 # Performs the first sync and starts CRON
-bash /root/dns-sync.sh && crond -f
+bash /root/dns-sync.sh
+touch /var/log/dns-sync.log
+tail -F /var/log/dns-sync.log &
+crond -f
 ```
 
 ## IPv4 vs IPv6
