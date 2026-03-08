@@ -6,6 +6,7 @@ It runs on CRON, checking the current IP address and updating DNS records for yo
 This fork has been modified to:
 * Support optional Team IDs (for both personal and team accounts)
 * Distinguish A from AAAA records
+* Be more robust in terms of error reporting
 
 ## Installation
 
