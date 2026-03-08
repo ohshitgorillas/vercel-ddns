@@ -4,7 +4,7 @@ Simple script for exposing a local server with [Vercel DNS](https://vercel.com/d
 It runs on CRON, checking the current IP address and updating DNS records for your domain.
 
 This fork has been modified to:
-* Work with accounts that have Team IDs
+* Support optional Team IDs (for both personal and team accounts)
 * Distinguish A from AAAA records
 
 ## Installation
@@ -75,43 +75,15 @@ CMD ["bash", "/root/start.sh"]
 bash /root/dns-sync.sh && crond -f
 ```
 
-## AAAA Records
+## IPv4 vs IPv6
 
-The script can be modified to work with IPv6 addresses and AAAA records.
+The `RECORD_TYPE` variable in `dns.config` controls whether the script manages an `A` (IPv4) or `AAAA` (IPv6) record:
 
-Make the following changes to `dns-sync.sh`:
-
-1. Change line 17 to `  ip=$(curl -6 -s https://ifconfig.co)`
-2. On line 30, change `\"A\"` to `\"AAAA\"`
-3. On lines 51 and 75, change `"A"` to `"AAAA"`
-
-If using Docker, you will also need to:
-
-1. Make a local copy of `dns-sync.sh` with the above modifications, as well as `start.sh` and `dns.config`.
-2. Use the Dockerfile below.
-3. Enable host networking via `--network=host` or `network_mode: host`.
-
-This Dockerfile pulls a local version of dns-sync.sh
-```dockerfile
-FROM alpine:latest
-
-WORKDIR /root
-
-# Installing dependencies
-RUN apk --no-cache add dcron curl jq bash
-SHELL ["/bin/bash", "-c"]
-
-# Cloning config and start file
-COPY dns.config /root/dns.config
-COPY start.sh /root/start.sh
-COPY dns-sync.sh /root/dns-sync.sh
-
-# Make the main script executable
-RUN chmod +x /root/dns-sync.sh
-
-# Setting up cron to run every minute
-RUN echo "* * * * * /root/dns-sync.sh >> /var/log/dns-sync.log 2>&1" >> /etc/crontabs/root
-
-# Starting
-CMD ["bash", "/root/start.sh"]
+```sh
+# "A" for IPv4 (default), "AAAA" for IPv6
+RECORD_TYPE="A"
 ```
+
+The script automatically uses the correct IP lookup endpoint for the chosen record type.
+
+If using Docker with IPv6, enable host networking via `--network=host` or `network_mode: host`.

@@ -5,16 +5,26 @@
 
 source /root/dns.config
 
+# Build optional team query parameter
+TEAM_QUERY=""
+if [[ -n "$TEAM_ID" ]]; then
+  TEAM_QUERY="?teamId=$TEAM_ID"
+fi
+
 # Check if jq is installed
 if ! command -v jq >/dev/null; then
   echo "Error: 'jq' is not installed. Please install 'jq' to run this script."
   exit 1
 fi
 
-# Returns current IP
+# Returns current IP (IPv4 for A records, IPv6 for AAAA records)
 get_current_ip() {
   local ip
-  ip=$(curl -s http://whatismyip.akamai.com/)
+  if [[ "$RECORD_TYPE" == "AAAA" ]]; then
+    ip=$(curl -s https://api6.ipify.org)
+  else
+    ip=$(curl -s http://whatismyip.akamai.com/)
+  fi
   echo $ip
 }
 
@@ -22,12 +32,12 @@ get_current_ip() {
 check_subdomain_exists() {
   local subdomain="$1"
   local response
-  response=$(curl -sX GET "https://api.vercel.com/v4/domains/$DOMAIN_NAME/records?teamId=$TEAM_ID" \
+  response=$(curl -sX GET "https://api.vercel.com/v4/domains/$DOMAIN_NAME/records$TEAM_QUERY" \
     -H "Authorization: Bearer $VERCEL_TOKEN" \
     -H "Content-Type: application/json")
 
   local record_id
-  record_id=$(echo "$response" | jq -r ".records[] | select(.name == \"$subdomain\" and .type == \"A\") | .id")
+  record_id=$(echo "$response" | jq -r ".records[] | select(.name == \"$subdomain\" and .type == \"$RECORD_TYPE\") | .id")
   if [[ -n "$record_id" ]]; then
     # Return record ID if exists
     echo "$record_id"
@@ -42,13 +52,13 @@ update_dns_record() {
   local ip="$1"
   local record_id="$2"
   local response
-  response=$(curl -sX PATCH "https://api.vercel.com/v1/domains/records/$record_id?teamId=$TEAM_ID" \
+  response=$(curl -sX PATCH "https://api.vercel.com/v1/domains/records/$record_id$TEAM_QUERY" \
     -H "Authorization: Bearer $VERCEL_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
       "comment": "vercel-ddns",
       "name": "'$SUBDOMAIN'",
-      "type": "A",
+      "type": "'$RECORD_TYPE'",
       "value": "'$ip'",
       "ttl": 60
     }')
@@ -66,13 +76,13 @@ update_dns_record() {
 create_dns_record() {
   local ip="$1"
   local response
-  response=$(curl -sX POST "https://api.vercel.com/v4/domains/$DOMAIN_NAME/records?teamId=$TEAM_ID" \
+  response=$(curl -sX POST "https://api.vercel.com/v4/domains/$DOMAIN_NAME/records$TEAM_QUERY" \
     -H "Authorization: Bearer $VERCEL_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
       "comment": "vercel-ddns",
       "name": "'$SUBDOMAIN'",
-      "type": "A",
+      "type": "'$RECORD_TYPE'",
       "value": "'$ip'",
       "ttl": 60
     }')
