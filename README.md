@@ -26,13 +26,11 @@ This fork has been modified to:
 ➜  ./dns-sync.sh
 Current IP: x.x.x.x
 Record for SUBDOMAIN.example.com does not exist. Creating...
-Done.
 
 # Updating
 ➜  ./dns-sync.sh
 Current IP: x.x.x.x
 Record for SUBDOMAIN.example.com already exists (id: rec_xxxxxxxxxxxxxxxxxxxxxxxx). Updating...
-Done.
 ```
 
 
