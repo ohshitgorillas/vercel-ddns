@@ -35,17 +35,6 @@ Record for SUBDOMAIN.example.com already exists (id: rec_xxxxxxxxxxxxxxxxxxxxxxx
 Done.
 ```
 
-## IPv4 vs IPv6
-
-The `RECORD_TYPE` variable in `dns.config` controls whether the script manages an `A` (IPv4) or `AAAA` (IPv6) record:
-
-```sh
-# "A" for IPv4 (default), "AAAA" for IPv6
-RECORD_TYPE="A"
-```
-
-The script automatically uses the correct IP lookup endpoint for the chosen record type.
-
 
 ## Docker Setup
 
