@@ -92,4 +92,4 @@ RECORD_TYPE="A"
 
 The script automatically uses the correct IP lookup endpoint for the chosen record type.
 
-If managing `AAAA` host records, you will need to enable host networking via `--network=host` or `network_mode: host`.
+If managing `AAAA` records through Docker, you will need to enable host networking via `--network=host` or `network_mode: host`.
