@@ -67,6 +67,20 @@ RUN echo "* * * * * /root/dns-sync.sh >> /proc/1/fd/1 2>&1" >> /etc/crontabs/roo
 CMD ["/bin/bash", "-c", "/root/dns-sync.sh && crond -f -l 2"]
 ```
 
+For `docker compose`, you can use the following example:
+
+```yaml
+services:
+  vercel-ddns:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vercel-ddns
+    restart: always 
+```
+
+Run `docker compose build` then `docker compose up -d` from the working directory.
+
 ## IPv4 vs IPv6
 
 The `RECORD_TYPE` variable in `dns.config` controls whether the script manages an `A` (IPv4) or `AAAA` (IPv6) record:
