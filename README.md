@@ -5,21 +5,21 @@ It runs on CRON, checking the current IP address and updating DNS records for yo
 
 This fork has been modified to:
 * Support optional Team IDs (for both personal and team accounts)
-* Distinguish A from AAAA records
+* Support `A` or `AAAA` records
 * Be more robust in terms of error reporting
 * Eliminate the need for a start script for Docker
 * Use standard `cron` instead of `dcron`
 
-## Installation
+## Bare Metal Installation
 
 1. Ensure that you have [jq](https://github.com/jqlang/jq) installed
-2. Download `dns-sync.sh`
+2. Download `dns-sync.sh` and `dns.config.example`
 3. Move `dns.config.example` to `dns.config`
 4. Edit the configuration variables as required (`TEAM_ID` is optional)
 5. Open the cron settings using the command `crontab -e`
 6. Add the following line to the cron job: `* * * * * /path-to/vercel-ddns/dns-sync.sh`
 
-## Usage example
+### Usage example
 
 ```sh
 # Creating
@@ -35,13 +35,25 @@ Record for SUBDOMAIN.example.com already exists (id: rec_xxxxxxxxxxxxxxxxxxxxxxx
 Done.
 ```
 
-## Docker
+## IPv4 vs IPv6
 
-There is a dockerized version of `vercel-ddns` with `CRON`.
+The `RECORD_TYPE` variable in `dns.config` controls whether the script manages an `A` (IPv4) or `AAAA` (IPv6) record:
+
+```sh
+# "A" for IPv4 (default), "AAAA" for IPv6
+RECORD_TYPE="A"
+```
+
+The script automatically uses the correct IP lookup endpoint for the chosen record type.
+
+
+## Docker Setup
+
+These instructions outline how to set up a dockerized version of `vercel-ddns`.
 
 Create 2 files in your directory:
 
-1. `dns.config` - configuration for `vercel-ddns`.
+1. `dns.config`: use `dns.config.example` and fill out appropriately
 2. The following `Dockerfile`:
 
 ```dockerfile
@@ -79,17 +91,4 @@ services:
     restart: always 
 ```
 
-Run `docker compose build` then `docker compose up -d` from the working directory.
-
-## IPv4 vs IPv6
-
-The `RECORD_TYPE` variable in `dns.config` controls whether the script manages an `A` (IPv4) or `AAAA` (IPv6) record:
-
-```sh
-# "A" for IPv4 (default), "AAAA" for IPv6
-RECORD_TYPE="A"
-```
-
-The script automatically uses the correct IP lookup endpoint for the chosen record type.
-
-If managing `AAAA` records through Docker, you will need to enable host networking via `--network=host` or `network_mode: host`.
+Run `docker compose build` then `docker compose up -d` from the working directory. If managing `AAAA` records through Docker, you will need to enable host networking via `--network=host` or `network_mode: host`.
