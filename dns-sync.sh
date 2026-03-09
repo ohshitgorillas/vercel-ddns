@@ -118,5 +118,3 @@ else
   echo "Record for $SUBDOMAIN.$DOMAIN_NAME does not exist. Creating..."
   create_dns_record "$ip"
 fi
-
-echo "Done."
