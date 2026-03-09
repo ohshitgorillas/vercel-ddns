@@ -79,6 +79,8 @@ RUN echo "* * * * * /root/dns-sync.sh >> /proc/1/fd/1 2>&1" >> /etc/crontabs/roo
 CMD ["/bin/bash", "-c", "/root/dns-sync.sh && crond -f -l 2"]
 ```
 
+**NOTE**: If managing `AAAA` records through Docker, you will need to enable host networking via `--network=host` or `network_mode: host`.
+
 Run `docker build .` followed by:
 
 ```bash
@@ -97,6 +99,7 @@ services:
     restart: always 
 ```
 
-Run `docker compose build` then `docker compose up -d` from the working directory. If managing `AAAA` records through Docker, you will need to enable host networking via `--network=host` or `network_mode: host`.
+
+Run `docker compose build` then `docker compose up -d` from the working directory. 
 
 Finally, check `docker logs vercel-ddns` or `docker compose logs vercel-ddns` to verify that everything is working.
