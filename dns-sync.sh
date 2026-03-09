@@ -6,7 +6,7 @@
 source /root/dns.config
 
 # Validate required config
-for var in VERCEL_TOKEN DOMAIN_NAME SUBDOMAIN RECORD_TYPE; do
+for var in VERCEL_TOKEN DOMAIN_NAME RECORD_TYPE; do
   if [[ -z "${!var}" ]]; then
     echo "Error: $var is not set in dns.config"
     exit 1
