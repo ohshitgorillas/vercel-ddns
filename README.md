@@ -79,7 +79,7 @@ RUN echo "* * * * * /root/dns-sync.sh >> /proc/1/fd/1 2>&1" >> /etc/crontabs/roo
 CMD ["/bin/bash", "-c", "/root/dns-sync.sh && crond -f -l 2"]
 ```
 
-For `docker compose`, you can use the following example:
+For `docker compose`, you can use the example `docker-compose.yaml` file:
 
 ```yaml
 services:
