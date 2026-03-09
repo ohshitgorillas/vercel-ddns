@@ -7,13 +7,15 @@ This fork has been modified to:
 * Support optional Team IDs (for both personal and team accounts)
 * Distinguish A from AAAA records
 * Be more robust in terms of error reporting
+* Eliminate the need for a start script for Docker
+* Use standard `cron` instead of `dcron`
 
 ## Installation
 
 1. Ensure that you have [jq](https://github.com/jqlang/jq) installed
 2. Download `dns-sync.sh`
 3. Move `dns.config.example` to `dns.config`
-4. Edit the configuration variables as required
+4. Edit the configuration variables as required (`TEAM_ID` is optional)
 5. Open the cron settings using the command `crontab -e`
 6. Add the following line to the cron job: `* * * * * /path-to/vercel-ddns/dns-sync.sh`
 
@@ -39,10 +41,8 @@ There is a dockerized version of `vercel-ddns` with `CRON`.
 
 Create 2 files in your directory:
 
-1. `Dockerfile`.
-2. `dns.config` - configuration for `vercel-ddns`.
-
-`Dockerfile`:
+1. `dns.config` - configuration for `vercel-ddns`.
+2. The following `Dockerfile`:
 
 ```dockerfile
 FROM alpine:latest
