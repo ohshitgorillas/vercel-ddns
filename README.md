@@ -9,6 +9,7 @@ This fork has been modified to:
 * Be more robust in terms of error reporting
 * Eliminate the need for a start script for Docker
 * Use standard `cron` instead of `dcron`
+* Publish a multi-arch image (`linux/amd64`, `linux/arm64`) to GHCR on every push to `master`
 
 ## Bare Metal Installation
 
@@ -33,60 +34,54 @@ Current IP: x.x.x.x
 Record for SUBDOMAIN.example.com already exists (id: rec_xxxxxxxxxxxxxxxxxxxxxxxx). Updating...
 ```
 
-
 ## Docker Setup
 
-These instructions outline how to set up a dockerized version of `vercel-ddns`.
+The image is published to GHCR as `ghcr.io/ohshitgorillas/vercel-ddns:latest`
+(multi-arch: `linux/amd64`, `linux/arm64`). It does **not** bake `dns.config` in —
+the config holds your `VERCEL_TOKEN`, so it must be bind-mounted at runtime.
 
-Create 2 files in your directory:
-
-1. `dns.config`: use `dns.config.example` and fill out appropriately
-2. The following `Dockerfile`:
-
-```dockerfile
-FROM alpine:latest
-
-WORKDIR /root
-
-# Installing dependencies
-RUN apk --no-cache add curl jq bash
-SHELL ["/bin/bash", "-c"]
-
-# Copy config
-COPY dns.config /root/dns.config
-
-# Cloning app
-RUN curl -o /root/dns-sync.sh https://raw.githubusercontent.com/ohshitgorillas/vercel-ddns/master/dns-sync.sh
-RUN chmod +x /root/dns-sync.sh
-
-# Setting up cron to run every minute
-RUN echo "* * * * * /root/dns-sync.sh >> /proc/1/fd/1 2>&1" >> /etc/crontabs/root
-
-# Perform first sync immediately, then hand off to cron
-CMD ["/bin/bash", "-c", "/root/dns-sync.sh && crond -f -l 2"]
-```
-
-**NOTE**: If managing `AAAA` records through Docker, you will need to enable host networking via `--network=host` or `network_mode: host`.
-
-Run `docker build .` followed by:
+1. Copy `dns.config.example` to `dns.config` and fill in your values.
+2. Run the container, mounting the config read-only at `/root/dns.config`:
 
 ```bash
-docker run -d --name vercel-ddns --restart always vercel-ddns
+docker run -d \
+  --name vercel-ddns \
+  --restart always \
+  -v "$(pwd)/dns.config:/root/dns.config:ro" \
+  ghcr.io/ohshitgorillas/vercel-ddns:latest
 ```
 
-For `docker compose`, you can use the example `docker-compose.yaml` file:
+Or with `docker compose`:
 
 ```yaml
 services:
   vercel-ddns:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/ohshitgorillas/vercel-ddns:latest
     container_name: vercel-ddns
-    restart: always 
+    restart: always
+    volumes:
+      - ./dns.config:/root/dns.config:ro
 ```
 
+**NOTE:** If managing `AAAA` records, enable host networking with `--network=host`
+(`docker run`) or `network_mode: host` (compose) so the container can see the host's
+public IPv6 address.
 
-Run `docker compose build` then `docker compose up -d` from the working directory. 
+Check `docker logs vercel-ddns` (or `docker compose logs vercel-ddns`) to verify the
+first sync ran cleanly.
 
-Finally, check `docker logs vercel-ddns` or `docker compose logs vercel-ddns` to verify that everything is working.
+### Building locally
+
+If you'd rather build the image yourself:
+
+```bash
+docker build -t vercel-ddns .
+docker run -d --name vercel-ddns --restart always \
+  -v "$(pwd)/dns.config:/root/dns.config:ro" vercel-ddns
+```
+
+Available tags on GHCR:
+* `latest` — tip of `master`
+* `master` — same as `latest`
+* `sha-<short-sha>` — pinned to a specific commit
+* semver tags (`vX.Y.Z`) once tagged releases are cut
